@@ -61,7 +61,7 @@ int main(int argc, char **argv)
         puts("I need at least one egg, and a number of floors.");
         return(1);
     }
-    //printf("STRING %s\n", argv[0]);
+
     egg_count = strtol(argv[2], NULL, 10);
     floors = strtol(argv[1], NULL, 10);
     printf("eggs: %d\nfloors: %d\n", egg_count, floors);
