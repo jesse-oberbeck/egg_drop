@@ -113,6 +113,7 @@ twoEggs(
     }
     egg *e = lay_egg();
     int currentFloor = *bottom;
+    //The formula below is from brilliant.org/wiki/egg-dropping/
     int step = ceil((-1 + (sqrt(1 + 8 * (*floors)))) / 2);
 
     while (!(egg_is_broken(e)))
