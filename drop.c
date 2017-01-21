@@ -16,13 +16,20 @@ void checkAndPrint(egg *e, int floor)
     }
 }
 
-int bruteUp(egg *e, int bottom, int *drops)
+int bruteUp(int bottom, int *drops, int floors)
 {
+    //"Last resort" used when on the last egg.
+    //Brute forces up from last known safe floor.
+    egg *e = lay_egg();
     int count = bottom;
-    //printf("BOTTOM: %d\n", bottom);
-    printf("egg status: %d\n", egg_is_broken(e));
     while(egg_is_broken(e) == 0)
     {
+        if(count >= floors)
+        {
+            puts("Can't be broken in this building!");
+            destroy_egg(e);
+            return(0);
+        }
         ++count;
         ++*drops;
         egg_drop_from_floor(e, count);
@@ -33,15 +40,16 @@ int bruteUp(egg *e, int bottom, int *drops)
     return(count - 1);
 }
 
-int findFloor(egg *e, int *egg_count, long int floors, int *drops)
+int findFloor(int *egg_count, long int floors, int *drops, int *top)
 {
-    //int drops = 0;
-    int top = floors;
+    //Handles initial guessing/calculation while egg count is above 2.
+    egg *e = lay_egg();
+    *top = floors;
     int bottom = 1;
     int half = floors / 2;
-    while((*egg_count > 2) || (top == bottom + 1))
+    while((*egg_count > 2) || (*top == bottom + 1))
     {
-        if(top == bottom + 1)
+        if(*top == bottom + 1)
         {
             printf("%d is the maximum safe floor, found after %d drops.\n", half , *drops);
             destroy_egg(e);
@@ -54,8 +62,8 @@ int findFloor(egg *e, int *egg_count, long int floors, int *drops)
         if(egg_is_broken(e) != 0)
         {
             printf("#floor %d CRACK\n", half);
-            top = half;
-            half = half - ((top - bottom) / 2);
+            *top = half;
+            half = half - ((*top - bottom) / 2);
             destroy_egg(e);
             e = lay_egg();
             --(*egg_count);
@@ -64,7 +72,7 @@ int findFloor(egg *e, int *egg_count, long int floors, int *drops)
         {
             printf("#floor %d safe\n", half);
             bottom = half;
-            half = half + ((top - bottom) / 2);
+            half = half + ((*top - bottom) / 2);
         }
         
     }
@@ -73,18 +81,18 @@ int findFloor(egg *e, int *egg_count, long int floors, int *drops)
     return(bottom);
 }
 
-int twoEggs(egg *e, int *floors, int *bottom, int *drops, int *egg_count)
+int twoEggs(int *floors, int *bottom, int *drops, int *egg_count)
 {
-    e = lay_egg();
-    printf("TWOEGGS!! %d\n", *egg_count);
+    //Meant to reduce probable number of guesses, especially in
+    //situations with higher numbers of floors, when the egg
+    //count is no more and no less than 2.
     if(*egg_count < 2)
     {
         return(*bottom);
     }
+    egg *e = lay_egg();
     int currentFloor = *bottom;
     int step = ceil(( -1 + (sqrt(1 + 8 * (*floors)))) / 2 );
-    printf("step: %d\n", step);
-    if(!(egg_is_broken(e))){puts("HAVE AN EGG");}
     while(!(egg_is_broken(e)))
     {
         egg_drop_from_floor(e, currentFloor);
@@ -105,7 +113,12 @@ int main(int argc, char **argv)
 {
     long int floors = 0;
     int egg_count = 0;
+    //Bottom moves up as the program goes through functions to reduce
+    //the number of guesses for each approach.
     int bottom = 1;
+    //Top changes with the eggs over 2 approach, but it seems it neither
+    //hurts nor helps the outcome.
+    int top = 0;
     int drops = 0;
 
     //Checking for args.
@@ -127,24 +140,20 @@ int main(int argc, char **argv)
         return(1);
     }
 
-    //Make the first egg. MIGHT REMOVE.
-    egg *e= lay_egg();
-    
-    if(egg_count > 2)
+    if(egg_count > 1)
     {
-        bottom = findFloor(e, &egg_count, floors, &drops);
+        bottom = findFloor(&egg_count, floors, &drops, &top);
     }
 
     if(bottom)
     {
-        int remainingFloors = floors - bottom;
-        bottom = twoEggs(e, &remainingFloors, &bottom, &drops, &egg_count);
+        int remainingFloors = top - bottom;
+        bottom = twoEggs(&remainingFloors, &bottom, &drops, &egg_count);
     }
 
     if(bottom)
     {
         //Brute force time...
-        e = lay_egg();
-        printf("result: %d\n", bruteUp(e, bottom, &drops) );
+        printf("result: %d\n", bruteUp(bottom, &drops, floors) );
     }
 }
