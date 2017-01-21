@@ -19,7 +19,7 @@ void checkAndPrint(egg *e, int floor)
 int bruteUp(egg *e, int bottom, int *drops)
 {
     int count = bottom;
-    printf("BOTTOM: %d\n", bottom);
+    //printf("BOTTOM: %d\n", bottom);
     printf("egg status: %d\n", egg_is_broken(e));
     while(egg_is_broken(e) == 0)
     {
@@ -39,20 +39,15 @@ int findFloor(egg *e, int *egg_count, long int floors, int *drops)
     int top = floors;
     int bottom = 1;
     int half = floors / 2;
-    while((*egg_count > 0) || (top == bottom + 1))
+    while((*egg_count > 2) || (top == bottom + 1))
     {
         if(top == bottom + 1)
         {
-            printf("%d is the maximum safe floor, found after %d drops.\n", half - 1, *drops);
+            printf("%d is the maximum safe floor, found after %d drops.\n", half , *drops);
             destroy_egg(e);
             return(0);
         }
-        if(*egg_count < 2)
-        {
-            printf("NUMBERS AT EXIT: %d %d\n", top, bottom);
-            destroy_egg(e);
-            return(bottom);
-        }
+
         egg_drop_from_floor(e, half);
         ++(*drops);
 
@@ -80,7 +75,12 @@ int findFloor(egg *e, int *egg_count, long int floors, int *drops)
 
 int twoEggs(egg *e, int *floors, int *bottom, int *drops, int *egg_count)
 {
-    int count = 0;
+    e = lay_egg();
+    printf("TWOEGGS!! %d\n", *egg_count);
+    if(*egg_count < 2)
+    {
+        return(*bottom);
+    }
     int currentFloor = *bottom;
     int step = ceil(( -1 + (sqrt(1 + 8 * (*floors)))) / 2 );
     printf("step: %d\n", step);
@@ -91,17 +91,14 @@ int twoEggs(egg *e, int *floors, int *bottom, int *drops, int *egg_count)
         ++(*drops);
         if(egg_is_broken(e))
         {
-            return(currentFloor - step);
             destroy_egg(e);
             --(*egg_count);
+            return(currentFloor - step);
         }
-        ++count;
         --step;
         currentFloor = currentFloor + step;
     }
-    //destroy_egg(e);
     return(currentFloor);
-
 }
 
 int main(int argc, char **argv)
@@ -132,10 +129,17 @@ int main(int argc, char **argv)
 
     //Make the first egg. MIGHT REMOVE.
     egg *e= lay_egg();
-    bottom = findFloor(e, &egg_count, floors, &drops);
+    
+    if(egg_count > 2)
+    {
+        bottom = findFloor(e, &egg_count, floors, &drops);
+    }
 
-    int remainingFloors = floors - bottom;
-    bottom = twoEggs(e, &remainingFloors, &bottom, &drops, &egg_count);
+    if(bottom)
+    {
+        int remainingFloors = floors - bottom;
+        bottom = twoEggs(e, &remainingFloors, &bottom, &drops, &egg_count);
+    }
 
     if(bottom)
     {
@@ -143,8 +147,4 @@ int main(int argc, char **argv)
         e = lay_egg();
         printf("result: %d\n", bruteUp(e, bottom, &drops) );
     }
-
-    //Removing remaining eggs.
-    //destroy_egg(e);
-
 }
