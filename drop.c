@@ -93,7 +93,6 @@ findFloor(
         }
 
     }
-    puts("Leaving find floor");
     destroy_egg(e);
     return (bottom);
 }
