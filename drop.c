@@ -19,7 +19,7 @@ checkAndPrint(
     }
 }
 
-int
+void
 bruteUp(
     int bottom,
     int *drops,
@@ -36,7 +36,7 @@ bruteUp(
         {
             puts("Can't be broken in this building!");
             destroy_egg(e);
-            return (0);
+            return;
         }
         ++count;
         ++*drops;
@@ -46,7 +46,7 @@ bruteUp(
     printf("%d is the maximum safe floor, found after %d drops.\n", count - 1,
            *drops);
     destroy_egg(e);
-    return (count - 1);
+    return;
 }
 
 int

@@ -51,6 +51,6 @@ main (int argc, char **argv)
   if (bottom)
     {
       //Brute force time...
-      printf ("result: %d\n", bruteUp (bottom, &drops, floors));
+      bruteUp (bottom, &drops, floors);
     }
 }
