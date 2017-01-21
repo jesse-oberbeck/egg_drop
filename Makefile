@@ -6,9 +6,9 @@ CFLAGS+=-std=c11
 
 LDLIBS+=-lm
 
-BIN=drop
-OBJ=egg.o
-DEPS=egg.h
+BIN=test
+OBJ=egg.o drop.o
+DEPS=egg.h drop.h
 
 $(BIN) : $(OBJ)
 

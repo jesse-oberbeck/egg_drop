@@ -1,6 +1,6 @@
 #include "egg.h"
 
-static const int SECRET_FLOOR_LIMIT = 84;
+static const int SECRET_FLOOR_LIMIT = 234;
 
 struct _egg
 {
